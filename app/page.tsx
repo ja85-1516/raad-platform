@@ -1,65 +1,30 @@
-import Image from "next/image";
+import { createClient } from '@supabase/supabase-js'
 
-export default function Home() {
+export default async function RaadDashboard() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  const { data: scrap } = await supabase.from('scrap_inventory').select('*')
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+    <div style={{ padding: '40px', fontFamily: 'Arial, sans-serif', backgroundColor: '#f0f4f8', minHeight: '100vh', direction: 'rtl' }}>
+      <header style={{ textAlign: 'center', marginBottom: '40px', borderBottom: '3px solid #2ecc71', paddingBottom: '20px' }}>
+        <h1 style={{ color: '#1a365d', fontSize: '2.5rem' }}>منصة راد | RAAD Platform</h1>
+        <p style={{ color: '#4a5568', fontSize: '1.2rem' }}>النظام العالمي لتتبع الخردة وأثر الكربون 🌍</p>
+      </header>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+        {scrap?.map((item) => (
+          <div key={item.id} style={{ background: '#fff', padding: '25px', borderRadius: '15px', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)', borderRight: '10px solid #2ecc71' }}>
+            <h2 style={{ color: '#2d3748', marginTop: '0' }}>📦 المادة: {item.material_type === 'Copper' ? 'نحاس' : item.material_type}</h2>
+            <p style={{ fontSize: '1.1rem' }}>⚖️ **الوزن:** {item.weight_kg} كجم</p>
+            <p style={{ fontSize: '1.1rem', color: '#2f855a' }}>🌱 **توفير الكربون:** {item.carbon_saved_kg} كجم CO2</p>
+            <p style={{ color: '#a0aec0', fontSize: '0.9rem' }}>📅 التاريخ: {new Date(item.created_at).toLocaleDateString('ar-SA')}</p>
+          </div>
+        ))}
+      </div>
     </div>
-  );
+  )
 }
