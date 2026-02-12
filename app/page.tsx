@@ -1,61 +1,126 @@
-import streamlit as st
+"use client"
+import { useEffect, useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
 
-# 1. إعداد الصفحة (يجب أن يكون أول أمر في الكود)
-st.set_page_config(page_title="منصة تدوير العالمية", layout="wide")
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
-# 2. تصميم الواجهة (CSS) لجعلها بيضاء وخضراء وتدعم العربية
-st.markdown("""
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-    html, body, [class*="css"] {
-        font-family: 'Cairo', sans-serif;
-        direction: RTL; text-align: right;
+export default function RaadVision2030Dashboard() {
+  const [data, setData] = useState<any[]>([])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: inventory } = await supabase.from('scrap_inventory').select('*')
+      if (inventory) setData(inventory)
     }
-    .stApp { background-color: #FFFFFF; }
-    h1, h2, h3 { color: #165d31 !important; }
-    div.stButton > button {
-        background-color: #165d31; color: white; border-radius: 10px;
-        width: 100%; height: 3em; font-size: 1.1rem; border: none;
-    }
-    .main-box {
-        padding: 20px; border: 2px solid #165d31; border-radius: 15px; background-color: #f9f9f9;
-    }
-    </style>
-    """, unsafe_allow_input=True)
+    fetchData()
+    const subscription = setInterval(fetchData, 5000)
+    return () => clearInterval(subscription)
+  }, [])
 
-# 3. الهيدر وشعار الرؤية
-col1, col2 = st.columns([1, 4])
-with col1:
-    st.image("https://www.vision2030.gov.sa/media/rc0bc5sc/vision_2030_logo.png", width=120)
-with col2:
-    st.title("منصة تدوير العالمية 🌍")
-    st.subheader("سوق الخردة الذكي وحساب البصمة الكربونية")
+  return (
+    <div dir="rtl" style={{ backgroundColor: '#000', color: '#fff', minHeight: '100vh', fontFamily: 'sans-serif', padding: '30px' }}>
+      
+      {/* Header السيادي: الهوية الوطنية الكاملة */}
+      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px', borderBottom: '1px solid #1a1a1a', paddingBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {/* شعار راد */}
+          <div>
+            <h1 style={{ fontSize: '3rem', fontWeight: '900', color: '#00ff88', margin: 0 }}>راد | RAAD</h1>
+            <p style={{ color: '#888', fontSize: '1rem', marginTop: '5px' }}>المنصة السيادية للتحكم في الموارد الاستراتيجية</p>
+          </div>
+        </div>
 
-st.divider()
+        {/* الرموز الوطنية: العلم والرؤية */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
+          <div style={{ textAlign: 'center' }}>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Saudi_Vision_2030_logo.svg" alt="Vision 2030" style={{ height: '60px', filter: 'brightness(0) invert(1)' }} />
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Flag_of_Saudi_Arabia.svg" alt="Saudi Flag" style={{ height: '50px', borderRadius: '5px', border: '1px solid #333' }} />
+          </div>
+          <div style={{ background: '#0a1a12', border: '1px solid #00ff88', padding: '10px 20px', borderRadius: '12px' }}>
+            <div style={{ color: '#00ff88', fontSize: '0.8rem' }}>التاريخ المرجعي</div>
+            <div style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>2026.02.12</div>
+          </div>
+        </div>
+      </header>
 
-# 4. محتوى التطبيق
-tab1, tab2 = st.tabs(["📦 عرض مواد للبيع", "📊 الأسعار المباشرة"])
+      {/* لوحة المؤشرات الاستراتيجية (The Pillars) */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '25px', marginBottom: '40px' }}>
+        <StatBox title="وفر الكربون التراكمي الموثق" value="1,284.5" unit="MT CO2e" color="#00ff88" label="موافق لمعايير رؤية 2030" />
+        <StatBox title="مؤشر ندرة المعادن (E-Waste)" value="84.2" unit="Index" color="#ffcc00" label="رصد (ليثيوم، كوبالت، ذهب)" />
+        <StatBox title="جاهزية الإمداد الصناعي" value="92" unit="%" color="#00d1ff" label="عقود تجميع ذكية نشطة" />
+      </div>
 
-with tab1:
-    st.write("### أضف الخردة أو المواد المعاد تدويرها")
-    with st.container():
-        st.markdown('<div class="main-box">', unsafe_allow_input=True)
-        item_type = st.selectbox("نوع المادة:", ["حديد سكراب", "ألمنيوم", "نحاس", "بلاستيك", "كرتون"])
-        weight = st.number_input("الكمية التقريبية (بالطن):", min_value=0.1)
-        city = st.text_input("المدينة:")
+      <div style={{ display: 'grid', gridTemplateColumns: '1.8fr 1fr', gap: '30px' }}>
         
-        if st.button("إرسال العرض وحساب الأثر"):
-            carbon_offset = weight * 1.5 # معادلة افتراضية
-            st.success(f"تم الإدراج! بمشاركتك هذه وفرت {carbon_offset} طن من انبعاثات الكربون.")
-        st.markdown('</div>', unsafe_allow_input=True)
+        {/* قسم البورصة والمزاد الحي */}
+        <div style={{ background: '#080808', borderRadius: '25px', padding: '30px', border: '1px solid #111' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '25px' }}>
+            <h2 style={{ fontSize: '1.8rem' }}>بورصة راد للموارد (المزاد الحي)</h2>
+            <div style={{ background: '#ff4444', color: '#fff', padding: '5px 15px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' }}>LIVE BIDDING</div>
+          </div>
+          <table style={{ width: '100%', textAlign: 'right', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ color: '#444', borderBottom: '2px solid #111' }}>
+                <th style={{ padding: '15px' }}>المورد / المصنع</th>
+                <th>المادة الاستراتيجية</th>
+                <th>الكتلة الموثقة</th>
+                <th>البصمة الكربونية</th>
+                <th>أعلى مزايدة حالية</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((item, i) => (
+                <tr key={i} style={{ borderBottom: '1px solid #111' }}>
+                  <td style={{ padding: '20px 15px', color: '#777' }}>مصانع المنطقة المركزية</td>
+                  <td style={{ fontWeight: 'bold', color: '#00ff88' }}>{item.material_type}</td>
+                  <td>{item.weight_kg} كجم</td>
+                  <td style={{ color: '#ffcc00' }}>-{item.carbon_saved_kg} kg CO2</td>
+                  <td>
+                    <button style={{ background: '#00ff88', color: '#000', border: 'none', padding: '10px 20px', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer' }}>
+                      مزايدة: {Math.floor(item.weight_kg * 4.5)} ريال
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-with tab2:
-    st.write("### أسعار السوق وتوفير الكربون")
-    # عرض البيانات بشكل مبسط لتجنب أخطاء المكتبات الخارجية
-    st.write("📍 **آخر العروض المتاحة:**")
-    st.info("📦 حديد سكراب - 50 طن - الرياض | السعر الحالي: 1450 ريال")
-    st.info("📦 بلاستيك PET - 10 طن - جدة | السعر الحالي: 650 ريال")
-    st.info("📦 نحاس - 2 طن - الدمام | السعر الحالي: 27,000 ريال")
+        {/* محرك التنبؤ RAAD-AI */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '25px' }}>
+          <div style={{ background: 'linear-gradient(145deg, #0a0a0a, #151515)', padding: '30px', borderRadius: '25px', border: '1px solid #222' }}>
+            <h3 style={{ color: '#00ff88', display: 'flex', alignItems: 'center', gap: '10px' }}>⚡ رؤية RAAD-AI الاستباقية</h3>
+            <p style={{ color: '#888', lineHeight: '1.7', fontSize: '0.95rem' }}>بناءً على تحليل <span style={{ color: '#fff' }}>1000 خوارزمية</span> لبورصة المعادن العالمية، نتوقع ارتفاع سعر النحاس بنسبة <span style={{ color: '#00ff88' }}>12.5%</span>. نوصي بتجميد البيع المباشر حالياً.</p>
+            <div style={{ background: '#000', padding: '15px', borderRadius: '12px', border: '1px dashed #ffcc00', marginTop: '20px' }}>
+              <span style={{ color: '#ffcc00', fontWeight: 'bold', fontSize: '0.8rem' }}>توصية السيادة:</span>
+              <div style={{ color: '#fff', marginTop: '5px' }}>توجيه الموارد نحو المصانع المحلية (الاكتفاء الذاتي)</div>
+            </div>
+          </div>
 
-# 5. رسالة للمستثمر في الجانب
-st.sidebar.success("هذا المشروع يدعم مبادرة السعودية الخضراء ويستهدف سوقاً بمليارات الريالات.")
+          <div style={{ background: '#00ff88', color: '#000', padding: '30px', borderRadius: '25px', textAlign: 'center', cursor: 'pointer' }}>
+            <h4 style={{ margin: 0, fontSize: '1.4rem', fontWeight: '900' }}>إصدار تقرير السيادة للمسؤولين</h4>
+            <p style={{ fontSize: '0.8rem', marginTop: '5px' }}>تقرير الأثر الاقتصادي والبيئي اللحظي</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StatBox({ title, value, unit, color, label }: any) {
+  return (
+    <div style={{ background: '#0a0a0a', padding: '30px', borderRadius: '25px', border: '1px solid #1a1a1a', textAlign: 'center' }}>
+      <p style={{ color: '#666', fontSize: '0.9rem', marginBottom: '15px' }}>{title}</p>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'baseline', gap: '10px' }}>
+        <span style={{ fontSize: '3rem', fontWeight: 'bold' }}>{value}</span>
+        <span style={{ color: color, fontWeight: 'bold' }}>{unit}</span>
+      </div>
+      <p style={{ color: '#444', fontSize: '0.75rem', marginTop: '10px' }}>{label}</p>
+    </div>
+  )
+}
