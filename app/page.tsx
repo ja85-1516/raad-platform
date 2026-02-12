@@ -1,106 +1,122 @@
 "use client"
 import { useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
-import { Leaf, Zap, Globe, TrendingUp, Brain } from 'lucide-react'
 
-// الربط مع Supabase باستخدام المفاتيح التي وضعتها في Vercel
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
-)
-
-export default function RaadDashboard() {
-  const [data, setData] = useState<any[]>([])
+export default function RaadPlatform() {
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    async function fetchData() {
-      const { data: inventory } = await supabase
-        .from('scrap_inventory')
-        .select('*')
-        .limit(5)
-      
-      if (inventory && inventory.length > 0) {
-        setData(inventory)
-      } else {
-        // بيانات تجريبية في حال كانت القاعدة فارغة لضمان ظهور العرض للمستثمر
-        setData([
-          { id: 1, material_type: "نحاس", weight_kg: 1250, last_bid: 5600, origin: "الرياض" },
-          { id: 2, material_type: "ألومنيوم", weight_kg: 890, last_bid: 3200, origin: "جدة" }
-        ])
-      }
-    }
-    fetchData()
+    // محاكاة تحميل البيانات لضمان استقرار التطبيق عند التشغيل الأول
+    const timer = setTimeout(() => setLoading(false), 1000)
+    return () => clearTimeout(timer)
   }, [])
 
   return (
-    <div dir="rtl" className="min-h-screen bg-[#050a0f] text-[#e6f7ff] p-8 font-sans">
-      {/* Header */}
-      <header className="flex justify-between items-center mb-12 border-b border-[#1a3a3a] pb-6">
+    <div dir="rtl" style={{ 
+      backgroundColor: '#050a0f', 
+      color: 'white', 
+      minHeight: '100vh', 
+      padding: '40px', 
+      fontFamily: 'system-ui, -apple-system, sans-serif' 
+    }}>
+      
+      {/* رأس الصفحة - الهوية الوطنية والتقنية */}
+      <header style={{ 
+        borderBottom: '5px solid #00ffaa', 
+        paddingBottom: '20px', 
+        marginBottom: '50px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
         <div>
-          <h1 className="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-[#00ffaa] to-[#ffd700]">
-            راد | RAAD
-          </h1>
-          <p className="text-[#00ffaa] mt-2 tracking-widest text-sm">منصة السيادة الرقمية للموارد</p>
+          <h1 style={{ fontSize: '65px', fontWeight: '900', color: '#00ffaa', margin: '0' }}>راد | RAAD</h1>
+          <p style={{ fontSize: '28px', color: '#888', marginTop: '10px' }}>السيادة الرقمية لإعادة التدوير</p>
         </div>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/Saudi_Vision_2030_logo.svg" className="h-16 brightness-200" alt="Vision 2030" />
+        <div style={{ textAlign: 'left' }}>
+          <div style={{ fontSize: '20px', color: '#ffd700', fontWeight: 'bold' }}>رؤية السعودية 2030</div>
+          <div style={{ fontSize: '16px', color: '#00f3ff' }}>المبادرة الخضراء</div>
+        </div>
       </header>
 
-      {/* Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-        <div className="bg-[#0a151a] p-6 rounded-2xl border border-[#00ffaa]/20 shadow-[0_0_15px_rgba(0,255,170,0.1)]">
-          <Leaf className="text-[#00ffaa] mb-4 w-10 h-10" />
-          <h3 className="text-gray-400 text-sm">الكربون الموفر</h3>
-          <p className="text-3xl font-bold">1,284.5 <span className="text-sm">طن</span></p>
+      {/* لوحة التحكم السريعة */}
+      <div style={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+        gap: '30px', 
+        marginBottom: '60px' 
+      }}>
+        <div style={statCardStyle('#00ffaa')}>
+          <h2 style={{ fontSize: '24px' }}>إجمالي الكربون الموفر</h2>
+          <p style={{ fontSize: '55px', fontWeight: 'bold' }}>1,284 <span style={{ fontSize: '20px' }}>طن</span></p>
         </div>
-        <div className="bg-[#0a151a] p-6 rounded-2xl border border-[#ffd700]/20 shadow-[0_0_15px_rgba(255,215,0,0.1)]">
-          <TrendingUp className="text-[#ffd700] mb-4 w-10 h-10" />
-          <h3 className="text-gray-400 text-sm">قيمة التداولات</h3>
-          <p className="text-3xl font-bold">4.2M <span className="text-sm">ريال</span></p>
-        </div>
-        <div className="bg-[#0a151a] p-6 rounded-2xl border border-[#00f3ff]/20 shadow-[0_0_15px_rgba(0,243,255,0.1)]">
-          <Brain className="text-[#00f3ff] mb-4 w-10 h-10" />
-          <h3 className="text-gray-400 text-sm">دقة توقعات AI</h3>
-          <p className="text-3xl font-bold">98%</p>
+        
+        <div style={statCardStyle('#ffd700')}>
+          <h2 style={{ fontSize: '24px' }}>قيمة التداولات اليومية</h2>
+          <p style={{ fontSize: '55px', fontWeight: 'bold' }}>4.2M <span style={{ fontSize: '20px' }}>ريال</span></p>
         </div>
       </div>
 
-      {/* Live Market */}
-      <div className="bg-[#0a151a] rounded-3xl border border-[#1a3a3a] overflow-hidden">
-        <div className="p-6 bg-[#081015] border-b border-[#1a3a3a] flex justify-between items-center">
-          <h2 className="text-2xl font-bold flex items-center gap-3">
-            <Zap className="text-[#ffd700]" /> بورصة الموارد المباشرة
-          </h2>
-          <span className="flex items-center gap-2 text-xs text-[#ff5252] animate-pulse">
-            <span className="w-2 h-2 bg-[#ff5252] rounded-full"></span> بث حي من المصانع
-          </span>
-        </div>
-        <table className="w-full text-right">
-          <thead className="text-gray-500 text-sm">
-            <tr>
-              <th className="p-6">المادة</th>
-              <th className="p-6">الكمية</th>
-              <th className="p-6">المصدر</th>
-              <th className="p-6">أعلى مزايدة</th>
-              <th className="p-6"></th>
+      {/* جدول البيانات الرئيسي بوضوح عالٍ */}
+      <div style={{ 
+        backgroundColor: '#0a151a', 
+        borderRadius: '30px', 
+        padding: '30px', 
+        border: '2px solid #1a3a3a' 
+      }}>
+        <h2 style={{ fontSize: '32px', marginBottom: '30px', color: '#00ffaa' }}>📦 بورصة الموارد المباشرة</h2>
+        
+        <table style={{ width: '100%', textAlign: 'right', fontSize: '22px', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid #1a3a3a', color: '#888' }}>
+              <th style={{ padding: '20px' }}>نوع المادة</th>
+              <th style={{ padding: '20px' }}>الكمية</th>
+              <th style={{ padding: '20px' }}>الحالة</th>
+              <th style={{ padding: '20px' }}>الإجراء</th>
             </tr>
           </thead>
           <tbody>
-            {data.map((item) => (
-              <tr key={item.id} className="border-t border-[#1a3a3a] hover:bg-[#0c1a20] transition-colors">
-                <td className="p-6 font-bold text-lg">{item.material_type}</td>
-                <td className="p-6 font-mono">{item.weight_kg} كجم</td>
-                <td className="p-6 text-gray-400">{item.origin}</td>
-                <td className="p-6 text-[#ffd700] font-bold">{item.last_bid} ر.س</td>
-                <td className="p-6">
-                  <button className="bg-gradient-to-r from-[#00ffaa] to-[#00cc88] text-black px-6 py-2 rounded-full font-bold hover:scale-105 transition-transform">
-                    مزايدة
-                  </button>
-                </td>
-              </tr>
-            ))}
+            <tr style={tableRowStyle}>
+              <td style={{ padding: '25px', fontWeight: 'bold' }}>حديد سكراب (ثقيل)</td>
+              <td style={{ padding: '25px' }}>450 طن</td>
+              <td style={{ padding: '25px', color: '#ffd700' }}>مزايدة نشطة</td>
+              <td style={{ padding: '25px' }}><button style={bidButtonStyle}>دخول المزاد</button></td>
+            </tr>
+            <tr style={tableRowStyle}>
+              <td style={{ padding: '25px', fontWeight: 'bold' }}>نحاس أحمر</td>
+              <td style={{ padding: '25px' }}>12 طن</td>
+              <td style={{ padding: '25px', color: '#00ffaa' }}>متاح للبيع</td>
+              <td style={{ padding: '25px' }}><button style={bidButtonStyle}>شراء فوري</button></td>
+            </tr>
           </tbody>
         </table>
       </div>
+
     </div>
   )
 }
+
+// تنسيقات العناصر لضمان الوضوح
+const statCardStyle = (color: string) => ({
+  padding: '40px',
+  backgroundColor: '#0a151a',
+  borderRadius: '25px',
+  border: `1px solid ${color}44`,
+  textAlign: 'center' as const,
+  boxShadow: `0 10px 30px ${color}11`
+});
+
+const tableRowStyle = {
+  borderBottom: '1px solid #1a3a3a',
+  transition: 'background 0.3s'
+};
+
+const bidButtonStyle = {
+  backgroundColor: '#00ffaa',
+  color: '#050a0f',
+  border: 'none',
+  padding: '12px 30px',
+  borderRadius: '12px',
+  fontSize: '18px',
+  fontWeight: 'bold',
+  cursor: 'pointer'
+};
