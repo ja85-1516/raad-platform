@@ -16,6 +16,7 @@ export default function ForgotPasswordPage() {
     setSuccess('')
     setLoading(true)
 
+    // محاكاة إرسال رابط الاستعادة
     setTimeout(() => {
       setSuccess('✓ تم إرسال رابط استعادة كلمة المرور إلى بريدك الإلكتروني')
       setLoading(false)
@@ -33,6 +34,19 @@ export default function ForgotPasswordPage() {
       justifyContent: 'center',
       padding: '24px'
     }}>
+      {/* خلفية */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        opacity: 0.03,
+        pointerEvents: 'none',
+        backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(0, 255, 170, 0.3) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.3) 0%, transparent 20%)'
+      }} />
+
+      {/* البطاقة الرئيسية */}
       <div style={{
         background: 'linear-gradient(145deg, rgba(10, 21, 26, 0.95), rgba(8, 16, 21, 0.95))',
         borderRadius: '32px',
@@ -44,6 +58,7 @@ export default function ForgotPasswordPage() {
         padding: '48px',
         position: 'relative'
       }}>
+        {/* الشعار */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <img
             src="/raad-logo.png"
@@ -80,6 +95,7 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
+        {/* رسائل النجاح والخطأ */}
         {error && (
           <div style={{
             background: 'rgba(255, 82, 82, 0.15)',
@@ -116,6 +132,7 @@ export default function ForgotPasswordPage() {
           </div>
         )}
 
+        {/* النموذج */}
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '24px' }}>
             <label style={{ 
@@ -194,6 +211,7 @@ export default function ForgotPasswordPage() {
           </button>
         </form>
 
+        {/* رابط العودة */}
         <div style={{
           marginTop: '32px',
           textAlign: 'center',
@@ -219,6 +237,7 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
 
+      {/* الأنماط */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes spin {
           0% { transform: rotate(0deg); }
