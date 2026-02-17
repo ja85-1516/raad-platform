@@ -16,7 +16,6 @@ export default function ForgotPasswordPage() {
     setSuccess('')
     setLoading(true)
 
-    // محاكاة إرسال رابط الاستعادة
     setTimeout(() => {
       setSuccess('✓ تم إرسال رابط استعادة كلمة المرور إلى بريدك الإلكتروني')
       setLoading(false)
@@ -34,19 +33,6 @@ export default function ForgotPasswordPage() {
       justifyContent: 'center',
       padding: '24px'
     }}>
-      {/* خلفية */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        opacity: 0.03,
-        pointerEvents: 'none',
-        backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(0, 255, 170, 0.3) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.3) 0%, transparent 20%)'
-      }} />
-
-      {/* البطاقة الرئيسية */}
       <div style={{
         background: 'linear-gradient(145deg, rgba(10, 21, 26, 0.95), rgba(8, 16, 21, 0.95))',
         borderRadius: '32px',
@@ -56,21 +42,8 @@ export default function ForgotPasswordPage() {
         width: '100%',
         maxWidth: '500px',
         padding: '48px',
-        position: 'relative',
-        overflow: 'hidden'
+        position: 'relative'
       }}>
-        {/* تأثيرات ضوئية */}
-        <div style={{
-          position: 'absolute',
-          top: '-50%',
-          right: '-50%',
-          width: '200%',
-          height: '200%',
-          background: 'radial-gradient(circle, rgba(0, 255, 170, 0.1) 0%, transparent 70%)',
-          animation: 'pulse 8s infinite'
-        }} />
-
-        {/* الشعار */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <img
             src="/raad-logo.png"
@@ -107,7 +80,6 @@ export default function ForgotPasswordPage() {
           </p>
         </div>
 
-        {/* رسائل النجاح والخطأ */}
         {error && (
           <div style={{
             background: 'rgba(255, 82, 82, 0.15)',
@@ -144,7 +116,6 @@ export default function ForgotPasswordPage() {
           </div>
         )}
 
-        {/* النموذج */}
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '24px' }}>
             <label style={{ 
@@ -199,9 +170,7 @@ export default function ForgotPasswordPage() {
               justifyContent: 'center',
               gap: '12px',
               boxShadow: loading ? 'none' : '0 6px 25px rgba(0, 255, 170, 0.4)',
-              transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-              position: 'relative',
-              overflow: 'hidden'
+              transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
             }}
           >
             {loading ? (
@@ -225,7 +194,6 @@ export default function ForgotPasswordPage() {
           </button>
         </form>
 
-        {/* رابط العودة */}
         <div style={{
           marginTop: '32px',
           textAlign: 'center',
@@ -251,12 +219,7 @@ export default function ForgotPasswordPage() {
         </div>
       </div>
 
-      {/* الأنماط */}
       <style dangerouslySetInnerHTML={{ __html: `
-        @keyframes pulse {
-          0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.7; transform: scale(1.02); }
-        }
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
