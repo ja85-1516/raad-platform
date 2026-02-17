@@ -1,0 +1,89 @@
+/* app/globals.css */
+
+/* السطر 3 - استيراد الخط - يجب أن يكون في البداية */
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap');
+
+/* السطر 5 - Tailwind */
+@import "tailwindcss";
+
+/* المتغيرات العامة */
+:root {
+  --primary: #00ffaa;
+  --primary-dark: #00cc88;
+  --secondary: #ffd700;
+  --accent: #00f3ff;
+  --background: #050a0f;
+  --surface: #0a151a;
+  --text: #e6f7ff;
+  --text-muted: #888;
+}
+
+/* التنسيقات الأساسية */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text);
+  font-family: 'Tajawal', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* الأنيميشن */
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes border-spin {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 170, 0.5); }
+  50% { box-shadow: 0 0 25px rgba(0, 255, 170, 0.8); }
+}
+
+/* شريط التمرير */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(8, 16, 21, 0.7);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #00ffaa, #00cc88);
+  border-radius: 6px;
+  border: 2px solid rgba(10, 21, 26, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #00e676, #00b366);
+  box-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
+}
+
+/* تحسينات الجوال */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+}

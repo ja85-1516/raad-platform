@@ -1,0 +1,219 @@
+// app/auctions/history/page.tsx
+'use client'
+
+import Link from 'next/link'
+import { useState } from 'react'
+
+export default function AuctionHistoryPage() {
+  const [filter, setFilter] = useState<'all' | 'completed' | 'cancelled'>('all')
+
+  const history = [
+    { id: 1, material: 'نحاس', weight: 12000, finalPrice: 540000, date: '2026-02-10', status: 'completed', winner: 'شركة المعادن المتقدمة' },
+    { id: 2, material: 'ألومنيوم', weight: 8000, finalPrice: 380000, date: '2026-02-09', status: 'completed', winner: 'مجموعة الصناعات الخفيفة' },
+    { id: 3, material: 'بلاستيك', weight: 20000, finalPrice: 850000, date: '2026-02-08', status: 'completed', winner: 'شركة إعادة التدوير الوطنية' },
+    { id: 4, material: 'إلكترونيات', weight: 3500, finalPrice: 1500000, date: '2026-02-07', status: 'cancelled', winner: '-' },
+    { id: 5, material: 'ليثيوم', weight: 1000, finalPrice: 7200000, date: '2026-02-06', status: 'completed', winner: 'شركة البطاريات الحديثة' },
+  ]
+
+  const filteredHistory = filter === 'all' 
+    ? history 
+    : history.filter(h => h.status === filter)
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(180deg, #050a0f 0%, #0a151a 100%)',
+      color: '#e6f7ff',
+      fontFamily: "'Tajawal', system-ui, -apple-system, sans-serif"
+    }}>
+      {/* الهيدر */}
+      <header style={headerStyle}>
+        <Link href="/" style={logoStyle}>راد | RAAD</Link>
+        <nav style={navStyle}>
+          <Link href="/" style={navLinkStyle}>الرئيسية</Link>
+          <Link href="/dashboard" style={navLinkStyle}>لوحة التحكم</Link>
+          <Link href="/auctions/live" style={navLinkStyle}>المزادات المباشرة</Link>
+          <Link href="/auth" style={navButtonStyle}>دخول المنصة</Link>
+        </nav>
+      </header>
+
+      {/* المحتوى */}
+      <main style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '48px 24px'
+      }}>
+        {/* العنوان */}
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h1 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontWeight: '800',
+            background: 'linear-gradient(90deg, #00ffaa, #ffd700)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '16px'
+          }}>
+            📜 سجل المزادات
+          </h1>
+          <p style={{ fontSize: '1.3rem', color: '#888' }}>
+            أرشيف كامل لجميع المزادات المنفذة والملغاة
+          </p>
+        </div>
+
+        {/* الفلاتر */}
+        <div style={{
+          display: 'flex',
+          gap: '16px',
+          marginBottom: '32px',
+          flexWrap: 'wrap',
+          justifyContent: 'center'
+        }}>
+          <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>الكل</FilterButton>
+          <FilterButton active={filter === 'completed'} onClick={() => setFilter('completed')} color="#00ffaa">مكتملة</FilterButton>
+          <FilterButton active={filter === 'cancelled'} onClick={() => setFilter('cancelled')} color="#ff5252">ملغاة</FilterButton>
+        </div>
+
+        {/* الجدول */}
+        <div style={{
+          background: 'rgba(10, 21, 26, 0.8)',
+          borderRadius: '24px',
+          padding: '32px',
+          border: '1px solid rgba(0, 255, 170, 0.2)',
+          overflowX: 'auto'
+        }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid rgba(0, 255, 170, 0.3)' }}>
+                <th style={thStyle}>المادة</th>
+                <th style={thStyle}>الوزن</th>
+                <th style={thStyle}>السعر النهائي</th>
+                <th style={thStyle}>التاريخ</th>
+                <th style={thStyle}>الحالة</th>
+                <th style={thStyle}>الفائز</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredHistory.map((item) => (
+                <tr key={item.id} style={{ borderBottom: '1px solid rgba(26, 58, 58, 0.5)' }}>
+                  <td style={tdStyle}>{item.material}</td>
+                  <td style={tdStyle}>{(item.weight / 1000).toFixed(1)} طن</td>
+                  <td style={{ ...tdStyle, color: '#ffd700', fontWeight: 'bold' }}>
+                    {item.finalPrice.toLocaleString('ar-SA')} ر.س
+                  </td>
+                  <td style={tdStyle}>{item.date}</td>
+                  <td style={tdStyle}>
+                    <span style={{
+                      padding: '6px 14px',
+                      borderRadius: '20px',
+                      fontSize: '0.9rem',
+                      fontWeight: '600',
+                      background: item.status === 'completed' 
+                        ? 'rgba(0, 255, 170, 0.2)' 
+                        : 'rgba(255, 82, 82, 0.2)',
+                      color: item.status === 'completed' ? '#00ffaa' : '#ff5252'
+                    }}>
+                      {item.status === 'completed' ? '✓ مكتمل' : '✗ ملغى'}
+                    </span>
+                  </td>
+                  <td style={tdStyle}>{item.winner}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </main>
+
+      {/* الفوتر */}
+      <footer style={footerStyle}>
+        <p>© 2026 منصة راد السيادية. جميع الحقوق محفوظة.</p>
+      </footer>
+    </div>
+  )
+}
+
+function FilterButton({ active, children, onClick, color = '#00ffaa' }: any) {
+  return (
+    <button style={{
+      padding: '12px 28px',
+      background: active ? `${color}25` : 'rgba(10, 21, 26, 0.8)',
+      color: active ? color : '#888',
+      border: active ? `1px solid ${color}` : '1px solid rgba(0, 255, 170, 0.2)',
+      borderRadius: '9999px',
+      fontSize: '1.1rem',
+      fontWeight: '600',
+      cursor: 'pointer',
+      transition: 'all 0.3s'
+    }}
+    onClick={onClick}
+    >
+      {children}
+    </button>
+  )
+}
+
+const headerStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '24px 48px',
+  borderBottom: '1px solid rgba(0, 255, 170, 0.1)',
+  flexWrap: 'wrap',
+  gap: '20px'
+}
+
+const logoStyle = {
+  fontSize: '2.5rem',
+  fontWeight: '800',
+  background: 'linear-gradient(90deg, #00ffaa, #ffd700)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  textDecoration: 'none'
+}
+
+const navStyle = {
+  display: 'flex',
+  gap: '24px',
+  flexWrap: 'wrap'
+}
+
+const navLinkStyle = {
+  color: '#888',
+  textDecoration: 'none',
+  fontSize: '1.1rem',
+  fontWeight: '600',
+  padding: '8px 16px',
+  transition: 'color 0.3s'
+}
+
+const navButtonStyle = {
+  background: 'linear-gradient(90deg, #00ffaa, #00cc88)',
+  color: '#050a0f',
+  padding: '12px 32px',
+  borderRadius: '16px',
+  fontSize: '1.1rem',
+  fontWeight: '700',
+  textDecoration: 'none'
+}
+
+const thStyle = {
+  padding: '20px 16px',
+  textAlign: 'right',
+  fontWeight: '700',
+  fontSize: '1.1rem',
+  color: '#aaa'
+}
+
+const tdStyle = {
+  padding: '20px 16px',
+  fontSize: '1.05rem',
+  color: '#e6f7ff'
+}
+
+const footerStyle = {
+  padding: '32px 48px',
+  borderTop: '1px solid rgba(0, 255, 170, 0.1)',
+  textAlign: 'center',
+  color: '#666',
+  fontSize: '0.95rem',
+  marginTop: '64px'
+}

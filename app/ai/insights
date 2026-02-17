@@ -1,0 +1,325 @@
+// app/ai/insights/page.tsx
+'use client'
+
+import Link from 'next/link'
+import { useState, useEffect } from 'react'
+
+export default function AIInsightsPage() {
+  const [selectedInsight, setSelectedInsight] = useState<number | null>(null)
+
+  const insights = [
+    {
+      id: 1,
+      type: 'تنبؤ',
+      title: 'ارتفاع أسعار النحاس',
+      content: 'بناءً على تحليل 1,284 مصدر بيانات عالمي، نتوقع ارتفاع بنسبة 12.5% في أسعار النحاس خلال الربع القادم',
+      confidence: '94%',
+      impact: 'عالي',
+      color: '#00ffaa'
+    },
+    {
+      id: 2,
+      type: 'توصية',
+      title: 'توجيه موارد الألمنيوم',
+      content: 'توصية استراتيجية بتوجيه 30% من موارد الألمنيوم لمشاريع الطاقة المتجددة لتعظيم العائد السيادي',
+      confidence: '89%',
+      impact: 'متوسط',
+      color: '#ffd700'
+    },
+    {
+      id: 3,
+      type: 'تنبيه',
+      title: 'ندرة الليثيوم المتوقعة',
+      content: 'تحذير من ندرة محتملة في مكونات الليثيوم بحلول الربع الثالث - يوصى بالاحتفاظ باحتياطي استراتيجي',
+      confidence: '87%',
+      impact: 'حرج',
+      color: '#ff5252'
+    },
+    {
+      id: 4,
+      type: 'فرصة',
+      title: 'طلب أوروبي على البلاستيك',
+      content: 'طلب متزايد على البلاستيك المعاد تدويره من السوق الأوروبي بأسعار تفوق السوق المحلي بنسبة 18%',
+      confidence: '92%',
+      impact: 'عالي',
+      color: '#00f3ff'
+    },
+  ]
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(180deg, #050a0f 0%, #0a151a 100%)',
+      color: '#e6f7ff',
+      fontFamily: "'Tajawal', system-ui, -apple-system, sans-serif"
+    }}>
+      {/* الهيدر */}
+      <header style={headerStyle}>
+        <Link href="/" style={logoStyle}>راد | RAAD</Link>
+        <nav style={navStyle}>
+          <Link href="/" style={navLinkStyle}>الرئيسية</Link>
+          <Link href="/dashboard" style={navLinkStyle}>لوحة التحكم</Link>
+          <Link href="/ai/insights" style={navLinkActive}>الذكاء الاصطناعي</Link>
+          <Link href="/auth" style={navButtonStyle}>دخول المنصة</Link>
+        </nav>
+      </header>
+
+      {/* المحتوى */}
+      <main style={{
+        maxWidth: '1400px',
+        margin: '0 auto',
+        padding: '48px 24px'
+      }}>
+        {/* العنوان */}
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <div style={{ fontSize: '5rem', marginBottom: '16px' }}>🧠</div>
+          <h1 style={{
+            fontSize: 'clamp(2.5rem, 5vw, 4rem)',
+            fontWeight: '800',
+            background: 'linear-gradient(90deg, #00ffaa, #ffd700)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '16px'
+          }}>
+            RAAD-AI السيادي
+          </h1>
+          <p style={{ fontSize: '1.3rem', color: '#888' }}>
+            رؤى استراتيجية مدعومة بالذكاء الاصطناعي لتحسين قرارات التداول
+          </p>
+        </div>
+
+        {/* بطاقات الرؤى */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+          gap: '24px',
+          marginBottom: '64px'
+        }}>
+          {insights.map((insight) => (
+            <InsightCard
+              key={insight.id}
+              insight={insight}
+              isSelected={selectedInsight === insight.id}
+              onSelect={() => setSelectedInsight(insight.id)}
+            />
+          ))}
+        </div>
+
+        {/* إحصائيات الذكاء الاصطناعي */}
+        <div style={{
+          background: 'rgba(10, 21, 26, 0.8)',
+          borderRadius: '32px',
+          padding: '48px',
+          border: '1px solid rgba(0, 255, 170, 0.2)'
+        }}>
+          <h2 style={{
+            fontSize: '2rem',
+            fontWeight: '800',
+            color: '#00ffaa',
+            textAlign: 'center',
+            marginBottom: '32px'
+          }}>
+            📊 أداء النموذج
+          </h2>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '24px'
+          }}>
+            <AIStat value="94%" label="دقة التنبؤات" color="#00ffaa" />
+            <AIStat value="1.2K+" label="مصدر بيانات" color="#ffd700" />
+            <AIStat value="24/7" label="تحليل مستمر" color="#00f3ff" />
+            <AIStat value="0.5s" label="زمن الاستجابة" color="#00cc88" />
+          </div>
+        </div>
+
+        {/* زر توليد تقرير */}
+        <div style={{ textAlign: 'center', marginTop: '48px' }}>
+          <button style={{
+            background: 'linear-gradient(90deg, #00ffaa, #00cc88)',
+            color: '#050a0f',
+            padding: '20px 60px',
+            borderRadius: '24px',
+            fontSize: '1.4rem',
+            fontWeight: '800',
+            border: 'none',
+            cursor: 'pointer',
+            boxShadow: '0 0 40px rgba(0, 255, 170, 0.5)',
+            transition: 'transform 0.3s'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            📄 توليد تقرير AI مخصص
+          </button>
+        </div>
+      </main>
+
+      {/* الفوتر */}
+      <footer style={footerStyle}>
+        <p>© 2026 منصة راد السيادية. جميع الحقوق محفوظة.</p>
+      </footer>
+    </div>
+  )
+}
+
+function InsightCard({ insight, isSelected, onSelect }: any) {
+  return (
+    <div style={{
+      padding: '32px',
+      background: isSelected 
+        ? 'linear-gradient(145deg, rgba(0, 108, 53, 0.3), rgba(0, 204, 136, 0.1))'
+        : 'rgba(10, 21, 26, 0.8)',
+      borderRadius: '24px',
+      border: `2px solid ${isSelected ? insight.color : insight.color + '30'}`,
+      transition: 'all 0.3s',
+      cursor: 'pointer'
+    }}
+    onClick={onSelect}
+    >
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '16px'
+      }}>
+        <span style={{
+          padding: '6px 14px',
+          borderRadius: '20px',
+          fontSize: '0.9rem',
+          fontWeight: '700',
+          background: `${insight.color}25`,
+          color: insight.color
+        }}>
+          {insight.type}
+        </span>
+        <span style={{
+          fontSize: '0.95rem',
+          color: '#888'
+        }}>
+          ثقة: {insight.confidence}
+        </span>
+      </div>
+
+      <h3 style={{
+        fontSize: '1.5rem',
+        fontWeight: '700',
+        color: insight.color,
+        marginBottom: '16px'
+      }}>
+        {insight.title}
+      </h3>
+
+      <p style={{
+        color: '#888',
+        fontSize: '1.1rem',
+        lineHeight: '1.7',
+        marginBottom: '20px'
+      }}>
+        {insight.content}
+      </p>
+
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <span style={{
+          padding: '6px 14px',
+          borderRadius: '20px',
+          fontSize: '0.9rem',
+          fontWeight: '600',
+          background: insight.impact === 'حرج' 
+            ? 'rgba(255, 82, 82, 0.2)' 
+            : insight.impact === 'عالي'
+            ? 'rgba(0, 255, 170, 0.2)'
+            : 'rgba(255, 215, 0, 0.2)',
+          color: insight.impact === 'حرج' 
+            ? '#ff5252' 
+            : insight.impact === 'عالي'
+            ? '#00ffaa'
+            : '#ffd700'
+        }}>
+          الأثر: {insight.impact}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function AIStat({ value, label, color }: any) {
+  return (
+    <div style={{ textAlign: 'center', padding: '24px' }}>
+      <div style={{
+        fontSize: '2.5rem',
+        fontWeight: '800',
+        color: color,
+        marginBottom: '8px'
+      }}>{value}</div>
+      <div style={{ color: '#888', fontSize: '1.1rem' }}>{label}</div>
+    </div>
+  )
+}
+
+const headerStyle = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '24px 48px',
+  borderBottom: '1px solid rgba(0, 255, 170, 0.1)',
+  flexWrap: 'wrap',
+  gap: '20px'
+}
+
+const logoStyle = {
+  fontSize: '2.5rem',
+  fontWeight: '800',
+  background: 'linear-gradient(90deg, #00ffaa, #ffd700)',
+  WebkitBackgroundClip: 'text',
+  WebkitTextFillColor: 'transparent',
+  textDecoration: 'none'
+}
+
+const navStyle = {
+  display: 'flex',
+  gap: '24px',
+  flexWrap: 'wrap'
+}
+
+const navLinkStyle = {
+  color: '#888',
+  textDecoration: 'none',
+  fontSize: '1.1rem',
+  fontWeight: '600',
+  padding: '8px 16px',
+  transition: 'color 0.3s'
+}
+
+const navLinkActive = {
+  color: '#00ffaa',
+  textDecoration: 'none',
+  fontSize: '1.1rem',
+  fontWeight: '600',
+  padding: '8px 16px',
+  background: 'rgba(0, 255, 170, 0.1)',
+  borderRadius: '12px'
+}
+
+const navButtonStyle = {
+  background: 'linear-gradient(90deg, #00ffaa, #00cc88)',
+  color: '#050a0f',
+  padding: '12px 32px',
+  borderRadius: '16px',
+  fontSize: '1.1rem',
+  fontWeight: '700',
+  textDecoration: 'none'
+}
+
+const footerStyle = {
+  padding: '32px 48px',
+  borderTop: '1px solid rgba(0, 255, 170, 0.1)',
+  textAlign: 'center',
+  color: '#666',
+  fontSize: '0.95rem',
+  marginTop: '64px'
+}

@@ -1,4 +1,4 @@
-// app/page.tsx
+// app/dashboard/page.tsx
 'use client'
 import { useEffect, useState, useMemo } from 'react'
 import { createClient } from '@supabase/supabase-js'
@@ -42,28 +42,18 @@ if (supabaseUrl && supabaseAnonKey) {
 export default function SovereignDashboard() {
   const [inventory, setInventory] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  // ✅ الإصلاح 1: بدء الوقت كـ null لتجنب Hydration Error
   const [currentTime, setCurrentTime] = useState<Date | null>(null)
   const [activeBid, setActiveBid] = useState<number | null>(null)
   const [aiInsightIndex, setAiInsightIndex] = useState(0)
   const [showNotification, setShowNotification] = useState(false)
   const [notificationMessage, setNotificationMessage] = useState('')
-  
-  // ✅ شاشة الترحيب - الرادار
-  const [showSplash, setShowSplash] = useState(true)
 
-  // تحديث الوقت
+  // ✅ الإصلاح 2: تعيين الوقت فقط على المتصفح (Client-side)
   useEffect(() => {
-    setCurrentTime(new Date())
+    setCurrentTime(new Date()) // تعيين الوقت الأولي
     const timer = setInterval(() => setCurrentTime(new Date()), 1000)
     return () => clearInterval(timer)
-  }, [])
-
-  // ✅ إخفاء شاشة الترحيب بعد 5 ثواني
-  useEffect(() => {
-    const splashTimer = setTimeout(() => {
-      setShowSplash(false)
-    }, 5000)
-    return () => clearTimeout(splashTimer)
   }, [])
 
   // جلب البيانات
@@ -180,148 +170,6 @@ export default function SovereignDashboard() {
     return { totalWeight, totalCarbon, totalValue, sovereigntyScore }
   }, [inventory])
 
-  // ✅ شاشة الترحيب - الرادار
-  if (showSplash) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(180deg, #050a0f 0%, #0a151a 100%)',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: "'Tajawal', system-ui, -apple-system, sans-serif",
-        overflow: 'hidden'
-      }}>
-        {/* تأثير الرادار */}
-        <div style={{
-          position: 'relative',
-          width: '400px',
-          height: '400px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
-          {/* الحلقات الدائرية */}
-          {[1, 2, 3, 4].map((ring) => (
-            <div
-              key={ring}
-              style={{
-                position: 'absolute',
-                width: `${ring * 25}%`,
-                height: `${ring * 25}%`,
-                border: `2px solid rgba(0, 255, 170, ${0.3 - ring * 0.05})`,
-                borderRadius: '50%',
-                animation: `pulse ${2 + ring * 0.5}s infinite`
-              }}
-            />
-          ))}
-          
-          {/* شعار راد في المركز */}
-          <img
-            src="/raad-logo.png"
-            alt="RAAD Logo"
-            style={{
-              width: '180px',
-              height: '180px',
-              objectFit: 'contain',
-              borderRadius: '50%',
-              background: 'rgba(255, 255, 255, 0.95)',
-              padding: '20px',
-              boxShadow: '0 0 60px rgba(0, 255, 170, 0.6), 0 0 100px rgba(255, 215, 0, 0.4)',
-              zIndex: 10,
-              animation: 'glow 2s infinite'
-            }}
-          />
-          
-          {/* خط المسح الذهبي */}
-          <div style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255, 215, 0, 0.4) 60deg, transparent 61deg)',
-            borderRadius: '50%',
-            animation: 'radar-scan 2s linear infinite',
-            zIndex: 5
-          }} />
-        </div>
-        
-        {/* نص التحميل */}
-        <div style={{
-          marginTop: '40px',
-          textAlign: 'center'
-        }}>
-          <h1 style={{
-            fontSize: '3rem',
-            fontWeight: '800',
-            background: 'linear-gradient(90deg, #00ffaa, #ffd700)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '16px',
-            animation: 'pulse 2s infinite'
-          }}>
-            راد | RAAD
-          </h1>
-          <p style={{
-            fontSize: '1.3rem',
-            color: '#888',
-            marginBottom: '24px'
-          }}>
-            المنصة السيادية للموارد الثانوية
-          </p>
-          
-          {/* شريط التحميل */}
-          <div style={{
-            width: '300px',
-            height: '6px',
-            background: 'rgba(26, 58, 58, 0.7)',
-            borderRadius: '9999px',
-            overflow: 'hidden',
-            margin: '0 auto'
-          }}>
-            <div style={{
-              width: '100%',
-              height: '100%',
-              background: 'linear-gradient(90deg, #00ffaa, #ffd700, #00ffaa)',
-              backgroundSize: '200% 100%',
-              animation: 'loading-bar 2s linear infinite',
-              borderRadius: '9999px'
-            }} />
-          </div>
-          
-          <p style={{
-            marginTop: '16px',
-            fontSize: '1rem',
-            color: '#666'
-          }}>
-            جاري تهيئة النظام السيادي...
-          </p>
-        </div>
-        
-        {/* الأنماط */}
-        <style dangerouslySetInnerHTML={{ __html: `
-          @keyframes radar-scan {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.05); }
-          }
-          @keyframes glow {
-            0%, 100% { box-shadow: 0 0 60px rgba(0, 255, 170, 0.6), 0 0 100px rgba(255, 215, 0, 0.4); }
-            50% { box-shadow: 0 0 80px rgba(0, 255, 170, 0.8), 0 0 120px rgba(255, 215, 0, 0.6); }
-          }
-          @keyframes loading-bar {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-          }
-        ` }} />
-      </div>
-    )
-  }
-
-  // ✅ المحتوى الرئيسي (بعد اختفاء شاشة الترحيب)
   return (
     <div style={{
       backgroundColor: '#050a0f',
@@ -344,7 +192,7 @@ export default function SovereignDashboard() {
         backgroundImage: 'radial-gradient(circle at 10% 20%, rgba(0, 255, 170, 0.3) 0%, transparent 20%), radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.3) 0%, transparent 20%), repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 243, 255, 0.1) 10px, rgba(0, 243, 255, 0.1) 20px)'
       }}></div>
 
-      {/* الهيدر الاحترافي - مع الشعار */}
+      {/* الهيدر الاحترافي */}
       <header style={{
         display: 'flex',
         flexDirection: 'column',
@@ -353,22 +201,7 @@ export default function SovereignDashboard() {
         paddingBottom: '24px',
         borderBottom: '1px solid rgba(0, 255, 170, 0.1)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-          {/* ✅ الشعار - المكان الأول */}
-          <img
-            src="/raad-logo.png"
-            alt="شعار منصة راد"
-            style={{
-              width: '100px',
-              height: '100px',
-              objectFit: 'contain',
-              borderRadius: '24px',
-              boxShadow: '0 0 30px rgba(0, 255, 170, 0.5)',
-              background: 'rgba(255, 255, 255, 0.95)',
-              padding: '8px'
-            }}
-          />
-          
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
           <div style={{ position: 'relative' }}>
             <div style={{
               position: 'absolute',
@@ -441,7 +274,6 @@ export default function SovereignDashboard() {
             </div>
           </div>
         </div>
-
         <div style={{
           display: 'flex',
           flexWrap: 'wrap',
@@ -540,6 +372,7 @@ export default function SovereignDashboard() {
 
           {/* الساعة الاحترافية + زر الدخول */}
           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
+            {/* ✅ الإصلاح 3: عرض الساعة فقط عندما يكون currentTime موجود */}
             {currentTime && (
               <div style={{
                 background: 'linear-gradient(145deg, rgba(10, 21, 26, 0.9), rgba(8, 16, 21, 0.9))',
@@ -571,6 +404,7 @@ export default function SovereignDashboard() {
                     letterSpacing: '1px'
                   }}>التوقيت الوطني</span>
                 </div>
+                {/* ✅ الإصلاح 4: إضافة suppressHydrationWarning */}
                 <div
                   style={{
                     fontSize: '2.8rem',
@@ -944,6 +778,7 @@ export default function SovereignDashboard() {
                   }}>
                     {(item.weight_kg / 1000).toLocaleString('ar-SA', { maximumFractionDigits: 1 })} <span style={{ color: '#888', fontSize: '1.1rem' }}>طن</span>
                   </td>
+                  {/* ✅ هنا تم الإصلاح: إضافة قيمة افتراضية في حال عدم وجود last_bid */}
                   <td style={{
                     padding: '24px 20px',
                     fontWeight: 'bold',
@@ -1418,14 +1253,6 @@ export default function SovereignDashboard() {
         @keyframes glow {
           0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 170, 0.5); }
           50% { box-shadow: 0 0 25px rgba(0, 255, 170, 0.8); }
-        }
-        @keyframes radar-scan {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-        @keyframes loading-bar {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 200% 50%; }
         }
         .card-hover {
           transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
