@@ -17,7 +17,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     setTimeout(() => {
-      setSuccess('✓ تم إرسال رابط الاستعادة')
+      setSuccess('تم إرسال رابط الاستعادة')
       setLoading(false)
     }, 2000)
   }
@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
             color: '#ffabab',
             marginBottom: '24px'
           }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -87,7 +87,7 @@ export default function ForgotPasswordPage() {
             color: '#00ffaa',
             marginBottom: '24px'
           }}>
-            ✓ {success}
+            {success}
           </div>
         )}
 
@@ -126,13 +126,13 @@ export default function ForgotPasswordPage() {
               cursor: loading ? 'not-allowed' : 'pointer'
             }}
           >
-            {loading ? 'جاري الإرسال...' : '📧 إرسال الرابط'}
+            {loading ? 'جاري الإرسال...' : 'إرسال الرابط'}
           </button>
         </form>
 
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
           <Link href="/auth" style={{ color: '#00ffaa', textDecoration: 'none' }}>
-            ← العودة لتسجيل الدخول
+            العودة لتسجيل الدخول
           </Link>
         </div>
       </div>
