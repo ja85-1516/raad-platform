@@ -1,5 +1,4 @@
 // app/auth/page.tsx
-
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -84,12 +83,10 @@ export default function AuthPage() {
     setSuccess('')
     setLoading(true)
 
-    // محاكاة عملية التحقق (في التطبيق الفعلي سيتم توجيه المستخدم لبوابة أبشر/نفاذ)
     setTimeout(() => {
       setLoading(false)
       setSuccess(`✓ جاري توجيهك إلى بوابة ${method === 'absher' ? 'أبشر' : 'نفاذ'} الرسمية...`)
       
-      // في التطبيق الفعلي: سيتم توجيه المستخدم لبوابة أبشر/نفاذ
       setTimeout(() => {
         alert(`تم محاكاة الدخول عبر ${method === 'absher' ? 'أبشر' : 'نفاذ'} بنجاح!`)
         router.push('/dashboard')
@@ -102,7 +99,6 @@ export default function AuthPage() {
     if (!email.trim()) return
     
     try {
-      // محاكاة التحقق من وجود الحساب (في التطبيق الفعلي سيتم التحقق من قاعدة البيانات)
       const demoAccounts = ['admin@rad.sa', 'user@rad.sa']
       setIsRegistered(demoAccounts.includes(email.toLowerCase()))
     } catch (err) {
@@ -309,7 +305,6 @@ export default function AuthPage() {
         {authMethod === 'email' ? (
           <form onSubmit={handleSignIn} style={{ position: 'relative', zIndex: 1 }}>
             <div style={{ marginBottom: '24px' }}>
-              {/* تم إصلاح الخطأ: إزالة display المكرر */}
               <label style={{ 
                 marginBottom: '10px', 
                 fontWeight: '600', 
@@ -321,7 +316,7 @@ export default function AuthPage() {
               }}>
                 <span>البريد الإلكتروني</span>
                 <Link 
-                  href="/auth/forgot-password" 
+                  href="/auth/password" 
                   style={{ 
                     color: '#00ffaa', 
                     fontSize: '0.95rem',
@@ -345,7 +340,11 @@ export default function AuthPage() {
                     setEmail(e.target.value)
                     setError('')
                   }}
-                  onBlur={checkExistingAccount}
+                  // ✅ تم الإصلاح: دمج onBlur في دالة واحدة
+                  onBlur={(e) => {
+                    checkExistingAccount()
+                    e.currentTarget.style.border = '1px solid rgba(0, 255, 170, 0.3)'
+                  }}
                   placeholder="example@rad.sa"
                   required
                   style={{
@@ -361,7 +360,6 @@ export default function AuthPage() {
                     boxSizing: 'border-box'
                   }}
                   onFocus={(e) => e.currentTarget.style.border = '1px solid #00ffaa'}
-                  onBlur={(e) => e.currentTarget.style.border = '1px solid rgba(0, 255, 170, 0.3)'}
                 />
                 <div style={{
                   position: 'absolute',
@@ -392,7 +390,6 @@ export default function AuthPage() {
             </div>
 
             <div style={{ marginBottom: '24px' }}>
-              {/* تم إصلاح الخطأ: إزالة display المكرر */}
               <label style={{ 
                 marginBottom: '10px', 
                 fontWeight: '600', 
@@ -403,20 +400,6 @@ export default function AuthPage() {
                 alignItems: 'center'
               }}>
                 <span>كلمة المرور</span>
-                <Link 
-                  href="/auth/forgot-password" 
-                  style={{ 
-                    color: '#00ffaa', 
-                    fontSize: '0.95rem',
-                    textDecoration: 'none',
-                    fontWeight: '500',
-                    transition: 'opacity 0.3s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.8'}
-                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                >
-                  نسيت كلمة المرور؟
-                </Link>
               </label>
               <div style={{
                 position: 'relative'
@@ -548,7 +531,6 @@ export default function AuthPage() {
             </button>
           </form>
         ) : (
-          // واجهة الدخول عبر أبشر/نفاذ
           <div style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}>
             <div style={{
               background: 'rgba(26, 58, 58, 0.4)',
@@ -883,9 +865,8 @@ export default function AuthPage() {
         </div>
       </div>
 
-      {/* الأنماط العالمية - تم إزالة @import الخطأ */}
+      {/* الأنماط العالمية */}
       <style dangerouslySetInnerHTML={{ __html: `
-        
         @keyframes pulse {
           0% { opacity: 1; transform: scale(1); }
           50% { opacity: 0.8; transform: scale(1.02); }
@@ -897,7 +878,6 @@ export default function AuthPage() {
           100% { transform: rotate(360deg); }
         }
         
-        /* شريط التمرير المخصص */
         ::-webkit-scrollbar {
           width: 10px;
         }
@@ -915,7 +895,6 @@ export default function AuthPage() {
           box-shadow: 0 0 10px rgba(0, 255, 170, 0.5);
         }
         
-        /* تحسينات الجوال */
         @media (max-width: 480px) {
           div[style*="maxWidth: '520px'"] {
             margin: 16px;
