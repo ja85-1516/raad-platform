@@ -1,0 +1,339 @@
+'use client'
+import { useEffect, useState } from 'react'
+import { createClient } from '@supabase/supabase-js'
+import Link from 'next/link'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+function getTimeLeft(endsAt: string) {
+  const diff = new Date(endsAt).getTime() - Date.now()
+  if (diff <= 0) return 'انتهى'
+  const h = Math.floor(diff / 3600000)
+  const m = Math.floor((diff % 3600000) / 60000)
+  const s = Math.floor((diff % 60000) / 1000)
+  return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`
+}
+
+function getMaterialColor(m: string) {
+  const c: any = { 'نحاس': '#ff9e64', 'ألومنيوم': '#c5a4ff', 'بلاستيك': '#64b5f6', 'إلكترونيات': '#ff5252', 'حديد': '#9e9e9e', 'ليثيوم': '#ffd700', 'ذهب': '#ffd700' }
+  return c[m] || '#00ffaa'
+}
+
+export default function LiveAuctions() {
+  const [auctions, setAuctions] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [bidAmounts, setBidAmounts] = useState<any>({})
+  const [submitting, setSubmitting] = useState<string | null>(null)
+  const [tick, setTick] = useState(0)
+
+  // تحديث العداد كل ثانية
+  useEffect(() => {
+    const t = setInterval(() => setTick(p => p + 1), 1000)
+    return () => clearInterval(t)
+  }, [])
+
+  // جلب المزادات
+  useEffect(() => {
+    fetchAuctions()
+    const t = setInterval(fetchAuctions, 10000)
+    return () => clearInterval(t)
+  }, [])
+
+  const fetchAuctions = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('auctions')
+        .select('*')
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      setAuctions(data || [])
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleBid = async (auctionId: string, currentPrice: number) => {
+    const amount = parseFloat(bidAmounts[auctionId] || '0')
+    if (!amount || amount <= currentPrice) {
+      alert(`يجب أن تكون المزايدة أعلى من ${currentPrice.toLocaleString('ar-SA')} ر.س`)
+      return
+    }
+
+    setSubmitting(auctionId)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        alert('يجب تسجيل الدخول أولاً')
+        return
+      }
+
+      // تسجيل المزايدة
+      await supabase.from('bids').insert({
+        auction_id: auctionId,
+        user_id: user.id,
+        amount: amount
+      })
+
+      // تحديث السعر الحالي
+      await supabase.from('auctions')
+        .update({ current_price: amount })
+        .eq('id', auctionId)
+
+      setBidAmounts((p: any) => ({ ...p, [auctionId]: '' }))
+      fetchAuctions()
+      alert('✅ تم تقديم مزايدتك بنجاح!')
+    } catch (err: any) {
+      alert('خطأ: ' + err.message)
+    } finally {
+      setSubmitting(null)
+    }
+  }
+
+  return (
+    <div style={{
+      minHeight: '100vh',
+      background: '#050a0f',
+      color: '#e6f7ff',
+      fontFamily: 'Tajawal, sans-serif',
+      direction: 'rtl'
+    }}>
+      {/* الهيدر */}
+      <header style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: '24px 48px',
+        borderBottom: '1px solid rgba(0,255,170,0.1)',
+        flexWrap: 'wrap',
+        gap: '16px'
+      }}>
+        <Link href="/" style={{
+          fontSize: '2rem',
+          fontWeight: '800',
+          background: 'linear-gradient(90deg, #00ffaa, #ffd700)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          textDecoration: 'none'
+        }}>
+          راد | RAAD
+        </Link>
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <Link href="/dashboard" style={{ color: '#888', textDecoration: 'none', fontSize: '1.1rem' }}>لوحة التحكم</Link>
+          <Link href="/auctions/history" style={{ color: '#888', textDecoration: 'none', fontSize: '1.1rem' }}>السجل</Link>
+          <Link href="/auctions/new" style={{
+            background: 'linear-gradient(90deg, #00ffaa, #00cc88)',
+            color: '#050a0f',
+            padding: '10px 24px',
+            borderRadius: '12px',
+            fontWeight: '700',
+            textDecoration: 'none',
+            fontSize: '1rem'
+          }}>
+            + رفع مزاد جديد
+          </Link>
+        </div>
+      </header>
+
+      <main style={{ maxWidth: '1200px', margin: '0 auto', padding: '48px 24px' }}>
+
+        {/* العنوان */}
+        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+          <h1 style={{
+            fontSize: '3rem',
+            fontWeight: '800',
+            background: 'linear-gradient(90deg, #00ffaa, #ffd700)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginBottom: '12px'
+          }}>
+            🔴 المزادات المباشرة
+          </h1>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+            <div style={{
+              width: '10px', height: '10px', borderRadius: '50%',
+              background: '#ff5252', boxShadow: '0 0 8px rgba(255,82,82,0.7)',
+              animation: 'pulse 1s infinite'
+            }} />
+            <span style={{ color: '#888' }}>مباشر — يتحدث كل ١٠ ثوانٍ</span>
+          </div>
+        </div>
+
+        {/* المزادات */}
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '80px', color: '#888', fontSize: '1.3rem' }}>
+            جاري التحميل...
+          </div>
+        ) : auctions.length === 0 ? (
+          <div style={{
+            textAlign: 'center',
+            padding: '80px',
+            background: 'rgba(10,21,26,0.8)',
+            borderRadius: '24px',
+            border: '1px solid rgba(0,255,170,0.2)'
+          }}>
+            <div style={{ fontSize: '4rem', marginBottom: '24px' }}>📭</div>
+            <h2 style={{ color: '#888', fontSize: '1.5rem', marginBottom: '16px' }}>
+              لا توجد مزادات نشطة الآن
+            </h2>
+            <Link href="/auctions/new" style={{
+              background: 'linear-gradient(90deg, #00ffaa, #00cc88)',
+              color: '#050a0f',
+              padding: '14px 32px',
+              borderRadius: '14px',
+              fontWeight: '700',
+              textDecoration: 'none',
+              fontSize: '1.1rem'
+            }}>
+              كن أول من يرفع مزاداً
+            </Link>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: '24px' }}>
+            {auctions.map(auction => {
+              const timeLeft = getTimeLeft(auction.ends_at)
+              const isEnding = new Date(auction.ends_at).getTime() - Date.now() < 3600000
+              const color = getMaterialColor(auction.material_type)
+
+              return (
+                <div key={auction.id} style={{
+                  background: 'rgba(10,21,26,0.9)',
+                  borderRadius: '24px',
+                  padding: '28px',
+                  border: `1px solid ${isEnding ? 'rgba(255,82,82,0.4)' : 'rgba(0,255,170,0.2)'}`,
+                  boxShadow: isEnding ? '0 0 20px rgba(255,82,82,0.15)' : 'none'
+                }}>
+
+                  {/* نوع المادة */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+                    <span style={{
+                      fontSize: '1.5rem',
+                      fontWeight: '800',
+                      color: color
+                    }}>
+                      {auction.material_type}
+                    </span>
+                    <span style={{
+                      padding: '4px 12px',
+                      background: isEnding ? 'rgba(255,82,82,0.2)' : 'rgba(0,255,170,0.15)',
+                      color: isEnding ? '#ff5252' : '#00ffaa',
+                      borderRadius: '20px',
+                      fontSize: '0.9rem',
+                      fontWeight: '600'
+                    }}>
+                      {isEnding ? '⚠️ ينتهي قريباً' : '🟢 نشط'}
+                    </span>
+                  </div>
+
+                  {/* التفاصيل */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#888' }}>
+                      <span>الوزن</span>
+                      <span style={{ color: '#e6f7ff', fontWeight: '600' }}>
+                        {(auction.weight_kg / 1000).toFixed(1)} طن
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#888' }}>
+                      <span>الموقع</span>
+                      <span style={{ color: '#e6f7ff', fontWeight: '600' }}>{auction.location}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#888' }}>
+                      <span>🌱 كربون موفر</span>
+                      <span style={{ color: '#00ffaa', fontWeight: '600' }}>
+                        {(auction.carbon_saved_kg || 0).toLocaleString('ar-SA')} كغ
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: '#888' }}>
+                      <span>🔐 رقم QR</span>
+                      <span style={{ color: '#ffd700', fontSize: '0.85rem', fontFamily: 'monospace' }}>
+                        {auction.qr_code?.substring(0, 20)}...
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* السعر الحالي */}
+                  <div style={{
+                    background: 'rgba(255,215,0,0.08)',
+                    border: '1px solid rgba(255,215,0,0.2)',
+                    borderRadius: '16px',
+                    padding: '16px',
+                    textAlign: 'center',
+                    marginBottom: '16px'
+                  }}>
+                    <div style={{ color: '#888', fontSize: '0.9rem', marginBottom: '4px' }}>أعلى مزايدة</div>
+                    <div style={{ fontSize: '2rem', fontWeight: '800', color: '#ffd700' }}>
+                      {(auction.current_price || auction.starting_price).toLocaleString('ar-SA')} ر.س
+                    </div>
+                  </div>
+
+                  {/* العداد */}
+                  <div style={{
+                    textAlign: 'center',
+                    fontSize: '1.8rem',
+                    fontWeight: '800',
+                    fontFamily: 'monospace',
+                    color: isEnding ? '#ff5252' : '#00ffaa',
+                    marginBottom: '20px',
+                    letterSpacing: '2px'
+                  }}>
+                    ⏱ {timeLeft}
+                  </div>
+
+                  {/* المزايدة */}
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input
+                      type="number"
+                      placeholder={`أعلى من ${(auction.current_price || auction.starting_price).toLocaleString('ar-SA')}`}
+                      value={bidAmounts[auction.id] || ''}
+                      onChange={e => setBidAmounts((p: any) => ({ ...p, [auction.id]: e.target.value }))}
+                      style={{
+                        flex: 1,
+                        padding: '12px',
+                        background: 'rgba(10,21,26,0.9)',
+                        border: '1px solid rgba(0,255,170,0.3)',
+                        borderRadius: '10px',
+                        color: '#e6f7ff',
+                        fontSize: '1rem',
+                        outline: 'none'
+                      }}
+                    />
+                    <button
+                      onClick={() => handleBid(auction.id, auction.current_price || auction.starting_price)}
+                      disabled={submitting === auction.id || timeLeft === 'انتهى'}
+                      style={{
+                        padding: '12px 20px',
+                        background: timeLeft === 'انتهى'
+                          ? '#333'
+                          : 'linear-gradient(90deg, #00ffaa, #00cc88)',
+                        color: '#050a0f',
+                        border: 'none',
+                        borderRadius: '10px',
+                        fontWeight: '800',
+                        fontSize: '1rem',
+                        cursor: timeLeft === 'انتهى' ? 'not-allowed' : 'pointer',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      {submitting === auction.id ? '...' : timeLeft === 'انتهى' ? 'انتهى' : 'زايد'}
+                    </button>
+                  </div>
+
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </main>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;600;700;800&display=swap');
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+      `}} />
+    </div>
+  )
+}
